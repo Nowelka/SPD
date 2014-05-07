@@ -1,19 +1,14 @@
 #include <iostream>
 #include <fstream>
 #include <cmath>
-#include <ctime>
 #include <vector>
-#include <string>
-#include <iomanip>
 #include <queue>
-#include <Windows.h>
-//#include "a.h"
 
 using namespace std;
 
 class Task {
 public:
-	int p, w, d;
+int p, w, d;
 	Task(int tp, int tw, int td): p(tp), w(tw), d(td) {};
 };
 
@@ -24,12 +19,12 @@ public:
 		: permutation(per), value(val), p(tp), w(tw), d(td){};
 };
 
-void fileIn(string, vector <Task> *);
-void optimal(vector <Task>);
+void fileIn(char*, vector <Task> *);
+void result(vector <Task>);
 int mini(vector <Optimal>, int);
 int AZ(vector <Optimal>, int, int);
 
-void fileIn(string nazwa, vector <Task> *wektor) {
+void fileIn(char* nazwa, vector <Task> *wektor) {
 	fstream file;
 	int noOfTasks;
 	file.open(nazwa, ios::in);
@@ -45,24 +40,17 @@ void fileIn(string nazwa, vector <Task> *wektor) {
 		file.close();
 	} else {
 		cout << "Plik nie otworzyl sie";
+		 cin.get();
 		exit(-1);
 	}
-	
 }
 
-void optimal(vector <Task> wektor) {
-	__int64 poczatek = 0, koniec = 0;
-	__int64 czestotliwosc;
-	QueryPerformanceFrequency((LARGE_INTEGER*) & czestotliwosc);
-	QueryPerformanceCounter((LARGE_INTEGER*) & poczatek);
+void result(vector <Task> wektor) {
 	vector <Optimal> optimals;
 	Optimal *o;
 	o = new Optimal(0,0,0,0,0);
 	optimals.push_back(*o);
 	int permutations = (int)pow((double)2,(int)wektor.size());
-//////////////////////////////////////////////////
-	__int64 poczatek1 = 0, koniec1 = 0;
-	QueryPerformanceCounter((LARGE_INTEGER*) & poczatek1);
 	for(int i = 1, k = 0, zm = 1; i < permutations; i++) {
 		if(i == zm) {
 			int tmp = ((wektor[k].p - wektor[k].d) * wektor[k].w);
@@ -86,27 +74,17 @@ void optimal(vector <Task> wektor) {
 			optimals.push_back(*o);
 		}
 	}
-	QueryPerformanceCounter((LARGE_INTEGER*) & koniec1);
-	cout << "\nCZAS 1  " << ((koniec1 - poczatek1) * 1000.0 / czestotliwosc) << " \n\n";
-////////////////////////////////////////////////
-	__int64 poczatek2 = 0, koniec2 = 0;
-	QueryPerformanceCounter((LARGE_INTEGER*) & poczatek2);
 	for(int i = 1, zm = 1; i < permutations; i++) {
 		if(i == zm)
 			zm = zm<<1;
 		else
 			optimals[i].value = mini(optimals,i);
 	}
-	QueryPerformanceCounter((LARGE_INTEGER*) & koniec2);
-	cout << "\nCZAS 2   " << ((koniec2 - poczatek2) * 1000.0 / czestotliwosc) << " \n\n";
-/////////////////////////////////////////////////////
-	cout << "WYNIK  " << optimals[optimals.size() - 1].value << endl;
-	QueryPerformanceCounter((LARGE_INTEGER*) & koniec);
-	cout << "\nCZAS   " << ((koniec-poczatek) * 1000.0 / czestotliwosc)<< " \n\n";
+	cout << "\nWYNIK  " << optimals[optimals.size() - 1].value << endl;
 }
 
 int mini(vector <Optimal> optimals, int per) {
-	priority_queue <int, vector<int>, greater<int>> que;
+	priority_queue < int, vector<int>, greater<int> > que;
 	for(int i = 0; i < per; i++)
 		if((per & (1 << i)) > 0)
 			que.push(AZ(optimals,per - (per & (1 << i)),(per & (1 << i))));
@@ -121,21 +99,15 @@ int AZ(vector <Optimal> optimals, int a, int z) {
 		return optimals[a].value;
 }
 
-void main() {
-	__int64 poczatek = 0, koniec = 0;
-	QueryPerformanceCounter((LARGE_INTEGER*) & poczatek);
+int main (int argc, char *argv[])
+{
 	vector <Task> wektor;
 	fileIn("data01.txt",&wektor);
 
 	cout << "liczba zadan " << (int)wektor.size() << endl;
 	for(int i = 0; i < (int)wektor.size(); i++)
 		cout << wektor[i].p << " " << wektor[i].w << " " << wektor[i].d << endl;
-	optimal(wektor);
-	//f();
-
-	QueryPerformanceCounter((LARGE_INTEGER*) & koniec);
-	__int64 czestotliwosc;
-	QueryPerformanceFrequency((LARGE_INTEGER*) & czestotliwosc);
-	cout << "\nCZAS CALEGO   " << ((koniec-poczatek) * 1000.0 / czestotliwosc) << " \n\n";
-	system("PAUSE");
+	result(wektor);
+    cin.get();
+    return 0;
 }
